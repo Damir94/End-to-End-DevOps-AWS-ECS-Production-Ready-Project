@@ -234,3 +234,88 @@ jobs:
 ![1_xUy--13b7NcTLoX2-q8hZw](https://github.com/user-attachments/assets/aacb43ce-82cb-4d47-9f3c-388c450ec474)
 
 ## Our both containers are in a running state
+
+![1_c84MQ1GSBakUj6UBTp5zFQ](https://github.com/user-attachments/assets/479dcb54-6e7c-4927-8314-b2629860ec9e)
+
+### Check the logs for our containers
+
+![1_VRw5LF34BaJ0t8x6Wcr_4Q](https://github.com/user-attachments/assets/416f01a2-db96-42cc-91e9-588625588407)
+
+### Both services are running perfectly
+
+![1_qy4r5hUWZAtzD8efMejd9w](https://github.com/user-attachments/assets/74624725-f62d-43a8-a043-9c782539a4c2)
+
+### Here is the LoadBalancer for the backend
+
+![1_dVGx3V39jw7MfunV5j8Wrw](https://github.com/user-attachments/assets/36cce94b-092c-4001-a2b5-ac0e8f20c63c)
+
+### Now copy the Backend ALB DNS and follow ahead
+
+## Frontend Deployment
+### Add the Backend Endpoint in your GitHub Secrets, as we are providing that while building our Dockerfile
+
+API_BASE_URL
+
+![1_9dKODnxeo9i7son8E1v52g](https://github.com/user-attachments/assets/bd631b36-92bc-4811-8b6f-f3ddfab5b492)
+
+## Fronted Workflow
+
+```bash
+name: Frontend Build & Push
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    defaults:
+      run:
+        shell: bash
+        working-directory: frontend
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and Push
+        uses: docker/build-push-action@v3
+        with:
+          context: frontend
+          path: frontend/Dockerfile
+          push: true
+          tags: 615299766984.dkr.ecr.us-east-1.amazonaws.com/dev/frontend:${{ github.run_number }}
+          build-args: |
+            REACT_APP_API_BASE_URL=${{ secrets.API_BASE_URL }}
+```
+## Now, we have to run the workflow for the frontend
+
+![1_GKw2FWftiD-QIIqbYGTPfQ](https://github.com/user-attachments/assets/da076f8c-602f-471e-8637-08f51c75521a)
+
+### The workflow successfully ran
+
+![1_dbAQBkiik0c7cEl_zTPI_A](https://github.com/user-attachments/assets/af254815-b5fe-426c-9128-875eb52255c4)
+
+### Here is the ECR Image for Frontend Docker
+
+![1_CMxSzIOG0TgnC7OTN7RYHg](https://github.com/user-attachments/assets/0011547c-7be7-456e-b501-04ed1f3c0958)
+
+### Now, we have to create the Task Definition for Frontend.
+
+![1_Y3NNHV3bJxpMy0s0TFY2CQ](https://github.com/user-attachments/assets/4bf812fc-4386-4a86-ba37-0493e327b137)
+
+Before creating a service for any tier. AWS will prompt you to have an execution Role so your service can have the privilege to talk or access other AWS services. In our case, our Service needs to get a few services, especially fetch values from Parameter Store. For that, we provided SSMFullAccess.
