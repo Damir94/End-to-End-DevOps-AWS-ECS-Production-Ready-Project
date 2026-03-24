@@ -319,3 +319,79 @@ jobs:
 ![1_Y3NNHV3bJxpMy0s0TFY2CQ](https://github.com/user-attachments/assets/4bf812fc-4386-4a86-ba37-0493e327b137)
 
 Before creating a service for any tier. AWS will prompt you to have an execution Role so your service can have the privilege to talk or access other AWS services. In our case, our Service needs to get a few services, especially fetch values from Parameter Store. For that, we provided SSMFullAccess.
+
+![1_AS938YSvyNmKngAtmPb_Dw](https://github.com/user-attachments/assets/9605bc52-69a6-4ac0-9adb-ce5514845b7a)
+
+![1_X7aIlmu6RuF-kykxBvQh0Q](https://github.com/user-attachments/assets/e083f4cf-faaa-4dfd-a813-9411c2618728)
+
+![1_stgIVkhW-6fiMCuEa2gI_Q](https://github.com/user-attachments/assets/0d885a58-0371-4a74-8456-d00c752f6c32)
+
+![1_H4QYDBsC-89g86D8OK0ebw](https://github.com/user-attachments/assets/89dbcc5b-10d5-4cc4-90f0-5366545133d6)
+
+![1_pd-yCwK3t8GMYG0XZlrfrQ](https://github.com/user-attachments/assets/a4ff286f-feaf-472e-91ab-d1342932d01d)
+
+### Task Definition has been created
+
+![1_IA1cuCXcmLNjDuVXVQBgqg](https://github.com/user-attachments/assets/0887525e-619d-45d8-ada0-083d5a5054ab)
+
+### Now we have to create a frontend service
+
+![1_yPonO81mx7LhsnDnnNKNfQ](https://github.com/user-attachments/assets/2eebc786-97c0-4de6-819c-4b52773b8cd9)
+
+![1_rl2co9H8RK8nF5JaQaZUxA](https://github.com/user-attachments/assets/c1cf14f7-afb4-4f90-89c6-dc93ec6c9c7e)
+
+![1_rl2co9H8RK8nF5JaQaZUxA](https://github.com/user-attachments/assets/b0d7f096-6067-436d-949d-3019daef6a1e)
+
+![1_K_TQ06eWKCv9_i0Q-XGvKQ](https://github.com/user-attachments/assets/4660a667-f826-49cb-9d15-8ee97236006f)
+
+### Our both task running for the Frontend service
+
+![1_8G8uzZo_1N4mG-69hKHIzg](https://github.com/user-attachments/assets/d79d8212-7fae-4c28-92bb-8652ea08e9ea)
+
+### Here is the Target Group, and we can see the targets are healthy for the TG.
+
+![1_b4kP910RhWPd3vrkrm_WYA](https://github.com/user-attachments/assets/b5a2eb4d-4447-4089-bf9c-e1a09cc4a828)
+
+Here is the Load Balancer for the frontend
+
+![1_1t-iu2KrfEaundwciOZUkA](https://github.com/user-attachments/assets/3108a9b3-e6a6-4a15-9701-83db849528a1)
+
+Now, we will add domain mapping to our Frontend Load Balancer. If you want, you can integrate ALB with CDN + WAF. Currently, I will be adding one domain with SSL So we can access the application legitimately.
+
+So, now click on Add listener and provide details as shown in the snippet below.
+
+![1_CShO0bl7iAu0xiT7w18fTA](https://github.com/user-attachments/assets/71c7b0d6-3242-404b-adc3-4f5c16e48c72)
+
+![1_ZdHSzgnfBPrg8lRCFDk7-w](https://github.com/user-attachments/assets/ea765023-15ae-4d48-baae-882a6f41743f)
+
+### Added to my DNS provider
+
+![1_z4MzdGGQecgcIeN_-7hnVA](https://github.com/user-attachments/assets/50e1fd1e-4a27-4291-8a8b-fb1a9d64bbdf)
+
+### Here we can see our application serving via my domain
+
+![1_zed47dx8dtwzSfYTI3D69A](https://github.com/user-attachments/assets/e3ff3780-569b-4d31-a6b0-67944f55f451)
+
+### The CRUD operation is working fine for the application for both the Teacher and the Student
+
+![1_SOrW7eBPtrjW9ZacAisOVw](https://github.com/user-attachments/assets/9891d404-80a4-40fe-826f-1da4445c5424)
+
+![1_osw7pQ2PbJ9QseA-Qtv9Gg](https://github.com/user-attachments/assets/b95f4644-1227-4193-82b9-44bf8f0fd6c2)
+
+### Now we have to do the cleanup part
+Follow the sequence to delete things one by one to avoid any extra cost
+- ECS Cluster
+- Tasking Definition from ECS Section (Deregister both TD(frontend and backend) one by one)
+- Load Balancers (frontend & backend
+- Target Groups (frontend & backend)
+- RDS
+- NAT Gateway
+- Associated Security Group(RDS & Default SG)
+- VPC (it will delete other associated services)
+- Parameter Store
+- ECR Repos
+
+### Conclusion
+This project gave me a deeper understanding of ECS deployments by bringing together containers, networking, CI/CD, and database connections in a single environment.
+
+What begins as the simple task of “running a container” quickly evolves into a complete system that involves security, traffic management, and automation. Working through this end-to-end setup made all of these components much easier to grasp.
